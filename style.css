@@ -1,0 +1,14 @@
+html,body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black;
+}
+#canvas {
+    display: block;
+    background:url("https://i.pinimg.com/originals/af/0b/d2/af0bd29608d5b99a4be6ee82e1312950.jpg") ;
+}
+
