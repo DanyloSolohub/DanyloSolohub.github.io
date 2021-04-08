@@ -252,7 +252,6 @@ function TheGame() {
         // Якщо пулька вилітає за межі вона видаляється
         if (bullets.length !== 0) {
             for (let i = 0; i < bullets.length; i++) {
-                console.log(bullets[i])
                 if (bullets[i].x < 0 || bullets[i].x > canvas.width || bullets[i].y < 0 || bullets[i].y > canvas.height) {
                     bullets.splice(i, 1)
                     break;
