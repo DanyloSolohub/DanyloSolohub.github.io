@@ -219,7 +219,6 @@ function TheGame() {
                 this.y = 0
             }
         }
-
         render() {
             ctx.beginPath();
             let vertAngle = ((Math.PI * 2) / 7);
@@ -235,7 +234,7 @@ function TheGame() {
         }
     }
 
-
+    // на ентер відбувається вистріл
     window.addEventListener('keyup', (e) => {
             if (e.code === 'Enter') {
                 bullets.push(new Bullet(spaceship.angle))
@@ -250,20 +249,40 @@ function TheGame() {
     requestAnimationFrame(animation)
 
     function animation(timestamp) {
+        // Якщо пулька вилітає за межі вона видаляється
+        if (bullets.length !== 0) {
+            for (let i = 0; i < bullets.length; i++) {
+                console.log(bullets[i])
+                if (bullets[i].x < 0 || bullets[i].x > canvas.width || bullets[i].y < 0 || bullets[i].y > canvas.height) {
+                    bullets.splice(i, 1)
+                    break;
+                }
+            }
+        }
+        // Якщо гравець набрав більший score ,ніж highScore то
+        // highScore перезаписується
         if (+highScore < +score) {
             highScore = score
             localStorage.setItem('highScore', score.toString())
         }
+        // Якщо астероїдів немає на полі , то вони з'являються
         if (asteroids.length === 0) {
             for (let i = 0; i < 8; i++) {
                 asteroids.push(new Asteroid());
             }
         }
+        // diff - час за який оновлюється кліент
         const diff = timestamp - pTime
         pTime = timestamp
+        // fps кількість кадрів в секунду
         const fps = (1000 / diff) ^ 0
+        // secondPart обернена величина до к-сті кадрів ,
+        // потрібна для правильного оновлення
         const secondPart = diff / 1000
+        // очищення поля
         ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+        // додаткова інформація виводиться на екран
         ctx.fillStyle = 'white'
         ctx.textAlign = 'left'
         ctx.font = '20px Georgia'
@@ -272,6 +291,7 @@ function TheGame() {
         ctx.fillText(`score: ${score}`, canvas.width * 0.1, canvas.height * 0.1)
         ctx.fillText(`lives: ${lives}`, canvas.width * 0.1, canvas.height * 0.1 + 20)
 
+        // перевірка на дотик корабля і астероїда
         if (asteroids.length !== 0) {
             for (let i = 0; i < asteroids.length; i++) {
                 if (CircleCollision(spaceship, asteroids[i])
@@ -295,11 +315,15 @@ function TheGame() {
                 }
             }
         }
+        // перевірка на дотик пульки з астероїдом
         if (asteroids.length !== 0 && bullets.length !== 0) {
+            // loop потрібен для перезапуску цикла,
+            // щоб не вийшло asteroids.length === 0 і не впала помилка
             loop:
                 for (let i = 0; i < asteroids.length; i++) {
                     for (let j = 0; j < bullets.length; j++) {
                         if (CircleCollision(asteroids[i], bullets[j])) {
+                            // якщо пулька попадає в астероїд - він розпадається
                             if (asteroids[i].level === 1) {
                                 asteroids.push(new Asteroid(asteroids[i].x - 5, asteroids[i].y - 5, asteroids[i].radius / 2, 2, asteroids[i].layoutRadius / 2))
                                 score += 10
@@ -308,7 +332,9 @@ function TheGame() {
                                 asteroids.push(new Asteroid(asteroids[i].x - 10, asteroids[i].y - 10, asteroids[i].radius / 2, 3, asteroids[i].layoutRadius / 2))
                                 asteroids.push(new Asteroid(asteroids[i].x + 10, asteroids[i].y + 10, asteroids[i].radius / 2, 3, asteroids[i].layoutRadius / 2))
                                 score += 20
-                            } else if (asteroids[i].level === 3) {
+                            }
+                            // найменший астероїд не розпадається ,а помирає
+                            else if (asteroids[i].level === 3) {
                                 score += 30
                             }
                             asteroids.splice(i, 1);
@@ -318,6 +344,8 @@ function TheGame() {
                     }
                 }
         }
+        // якщо lives стає <= 0 то висвітчується надпис
+        // game over і при натиску на пробіл перезапускає гру
         if (lives <= 0) {
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             asteroids.length = 0
@@ -335,7 +363,9 @@ function TheGame() {
                     lives = 5
                 }
             })
-        } else {
+        }
+        // якщо lives > 0  рендеряться астероїди пульки і все решта
+        else {
             if (spaceship.visible) {
                 spaceship.update(secondPart)
                 spaceship.render()
