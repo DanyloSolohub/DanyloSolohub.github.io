@@ -36,6 +36,22 @@ function TheGame() {
             this.y = y
             this.x = x
         }
+
+
+        isOnCanvas() {
+            if (this.x < 0) {
+                this.x = canvas.width
+            }
+            if (this.x > canvas.width) {
+                this.x = 0
+            }
+            if (this.y < 0) {
+                this.y = canvas.height
+            }
+            if (this.y > canvas.height) {
+                this.y = 0
+            }
+        }
     }
 
 
@@ -55,6 +71,11 @@ function TheGame() {
         }
 
         update(secondPart) {
+            if (this.angle > 2 * Math.PI) {
+                this.angle = 0
+            } else if (this.angle < 0) {
+                this.angle = 2 * Math.PI
+            }
             window.addEventListener('keydown', (e) => {
                 if (e.code === 'KeyW') {
                     this.movingFront = true
@@ -99,18 +120,7 @@ function TheGame() {
             this.x += this.accX
             this.y -= this.accY
 
-            if (this.x < 0) {
-                this.x = canvas.width
-            }
-            if (this.x > canvas.width) {
-                this.x = 0
-            }
-            if (this.y < 0) {
-                this.y = canvas.height
-            }
-            if (this.y > canvas.height) {
-                this.y = 0
-            }
+            this.isOnCanvas()
         }
 
 
@@ -206,19 +216,9 @@ function TheGame() {
             this.x += Math.cos(this.angle) * this.speed;
             this.y += Math.sin(this.angle) * this.speed;
 
-            if (this.x < 0) {
-                this.x = canvas.width
-            }
-            if (this.x > canvas.width) {
-                this.x = 0
-            }
-            if (this.y < 0) {
-                this.y = canvas.height
-            }
-            if (this.y > canvas.height) {
-                this.y = 0
-            }
+            this.isOnCanvas()
         }
+
         render() {
             ctx.beginPath();
             let vertAngle = ((Math.PI * 2) / 7);
@@ -241,151 +241,137 @@ function TheGame() {
             }
         }
     )
-
     highScore = localStorage.getItem('highScore') || 0
     let spaceship = new Ship()
-    let gun = new Bullet()
-    let pTime = 0
-    requestAnimationFrame(animation)
-
-    function animation(timestamp) {
-        // Якщо пулька вилітає за межі вона видаляється
-        if (bullets.length !== 0) {
-            for (let i = 0; i < bullets.length; i++) {
-                if (bullets[i].x < 0 || bullets[i].x > canvas.width || bullets[i].y < 0 || bullets[i].y > canvas.height) {
-                    bullets.splice(i, 1)
-                    break;
+    animation({
+        update() {
+            // Якщо астероїдів немає на полі , то вони з'являються
+            if (asteroids.length === 0) {
+                for (let i = 0; i < 8; i++) {
+                    asteroids.push(new Asteroid());
                 }
             }
-        }
-        // Якщо гравець набрав більший score ,ніж highScore то
-        // highScore перезаписується
-        if (+highScore < +score) {
-            highScore = score
-            localStorage.setItem('highScore', score.toString())
-        }
-        // Якщо астероїдів немає на полі , то вони з'являються
-        if (asteroids.length === 0) {
-            for (let i = 0; i < 8; i++) {
-                asteroids.push(new Asteroid());
-            }
-        }
-        // diff - час за який оновлюється кліент
-        const diff = timestamp - pTime
-        pTime = timestamp
-        // fps кількість кадрів в секунду
-        const fps = Math.round(1000 / diff) 
-        // secondPart обернена величина до к-сті кадрів ,
-        // потрібна для правильного оновлення
-        const secondPart = diff / 1000
-        // очищення поля
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-        // додаткова інформація виводиться на екран
-        ctx.fillStyle = 'white'
-        ctx.textAlign = 'left'
-        ctx.font = '20px Georgia'
-        ctx.fillText(`FPS: ${fps}`, canvas.width * 0.9, canvas.height * 0.1)
-        ctx.fillText(`High score: ${highScore}`, canvas.width * 0.1, canvas.height * 0.1 - 20)
-        ctx.fillText(`score: ${score}`, canvas.width * 0.1, canvas.height * 0.1)
-        ctx.fillText(`lives: ${lives}`, canvas.width * 0.1, canvas.height * 0.1 + 20)
-
-        // перевірка на дотик корабля і астероїда
-        if (asteroids.length !== 0) {
-            for (let i = 0; i < asteroids.length; i++) {
-                if (CircleCollision(spaceship, asteroids[i])
-                ) {
-                    if (helper) {
-                        lives -= 1
-                        helper = false
-                    }
-                    spaceship.visible = false
-                    gun.visible = false
-                    setTimeout(() => {
-                        helper = true
-                        gun.visible = true
-                        spaceship.visible = true
-                        spaceship.x = canvas.width / 2
-                        spaceship.y = canvas.height / 2
-                        spaceship.accX = 0
-                        spaceship.accY = 0
-                    }, 1000)
-
-                }
-            }
-        }
-        // перевірка на дотик пульки з астероїдом
-        if (asteroids.length !== 0 && bullets.length !== 0) {
-            // loop потрібен для перезапуску цикла,
-            // щоб не вийшло asteroids.length === 0 і не впала помилка
-            loop:
-                for (let i = 0; i < asteroids.length; i++) {
-                    for (let j = 0; j < bullets.length; j++) {
-                        if (CircleCollision(asteroids[i], bullets[j])) {
-                            // якщо пулька попадає в астероїд - він розпадається
-                            if (asteroids[i].level === 1) {
-                                asteroids.push(new Asteroid(asteroids[i].x - 5, asteroids[i].y - 5, asteroids[i].radius / 2, 2, asteroids[i].layoutRadius / 2))
-                                score += 10
-                                asteroids.push(new Asteroid(asteroids[i].x + 5, asteroids[i].y + 5, asteroids[i].radius / 2, 2, asteroids[i].layoutRadius / 2))
-                            } else if (asteroids[i].level === 2) {
-                                asteroids.push(new Asteroid(asteroids[i].x - 10, asteroids[i].y - 10, asteroids[i].radius / 2, 3, asteroids[i].layoutRadius / 2))
-                                asteroids.push(new Asteroid(asteroids[i].x + 10, asteroids[i].y + 10, asteroids[i].radius / 2, 3, asteroids[i].layoutRadius / 2))
-                                score += 20
-                            }
-                            // найменший астероїд не розпадається ,а помирає
-                            else if (asteroids[i].level === 3) {
-                                score += 30
-                            }
-                            asteroids.splice(i, 1);
-                            bullets.splice(j, 1);
-                            break loop
-                        }
-                    }
-                }
-        }
-        // якщо lives стає <= 0 то висвітчується надпис
-        // game over і при натиску на пробіл перезапускає гру
-        if (lives <= 0) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
-            asteroids.length = 0
-            ctx.fillStyle = 'white'
-            ctx.textAlign = 'center'
-            ctx.font = '200px Georgia'
-            ctx.fillText(`Game over`, canvas.width / 2, canvas.height / 2)
-            ctx.font = '70px Georgia'
-            ctx.fillText(`press space to restart`, canvas.width / 2, canvas.height / 2 + 200)
-            ctx.font = '30px Georgia'
-            ctx.fillText(`Your score ${score}`, canvas.width / 2, canvas.height / 2 + 270)
-            window.addEventListener('keydown', (e) => {
-                if (e.code === 'Space') {
-                    score = 0
-                    lives = 5
-                }
-            })
-        }
-        // якщо lives > 0  рендеряться астероїди пульки і все решта
-        else {
-            if (spaceship.visible) {
-                spaceship.update(secondPart)
-                spaceship.render()
-            }
+            // Якщо пулька вилітає за межі вона видаляється
             if (bullets.length !== 0) {
                 for (let i = 0; i < bullets.length; i++) {
-                    bullets[i].update(spaceship.angle)
-                    bullets[i].render()
+                    if (bullets[i].x < 0 || bullets[i].x > canvas.width || bullets[i].y < 0 || bullets[i].y > canvas.height) {
+                        bullets.splice(i, 1)
+                        // break;
+                    }
                 }
             }
+
+            // перевірка на дотик корабля і астероїда
             if (asteroids.length !== 0) {
-                for (let j = 0; j < asteroids.length; j++) {
-                    asteroids[j].update();
-                    asteroids[j].render(j);
+                for (let i = 0; i < asteroids.length; i++) {
+                    if (CircleCollision(spaceship, asteroids[i])
+                    ) {
+                        if (helper) {
+                            lives -= 1
+                            helper = false
+                        }
+                        spaceship.visible = false
+                        setTimeout(() => {
+                            spaceship.visible = true
+                            spaceship.x = canvas.width / 2
+                            spaceship.y = canvas.height / 2
+                            spaceship.accX = 0
+                            spaceship.accY = 0
+                            helper = true
+                        }, 1000)
+
+                    }
                 }
             }
+            // перевірка на дотик пульки з астероїдом
+            if (asteroids.length !== 0 && bullets.length !== 0) {
+                // loop потрібен для перезапуску цикла,
+                // щоб не вийшло asteroids.length === 0 і не впала помилка
+                loop:
+                    for (let i = 0; i < asteroids.length; i++) {
+                        for (let j = 0; j < bullets.length; j++) {
+                            if (CircleCollision(asteroids[i], bullets[j])) {
+                                // якщо пулька попадає в астероїд - він розпадається
+                                if (asteroids[i].level === 1) {
+                                    asteroids.push(new Asteroid(asteroids[i].x - 5, asteroids[i].y - 5, asteroids[i].radius / 2, 2, asteroids[i].layoutRadius / 2))
+                                    score += 10
+                                    asteroids.push(new Asteroid(asteroids[i].x + 5, asteroids[i].y + 5, asteroids[i].radius / 2, 2, asteroids[i].layoutRadius / 2))
+                                } else if (asteroids[i].level === 2) {
+                                    asteroids.push(new Asteroid(asteroids[i].x - 10, asteroids[i].y - 10, asteroids[i].radius / 2, 3, asteroids[i].layoutRadius / 2))
+                                    asteroids.push(new Asteroid(asteroids[i].x + 10, asteroids[i].y + 10, asteroids[i].radius / 2, 3, asteroids[i].layoutRadius / 2))
+                                    score += 20
+                                }
+                                // найменший астероїд не розпадається ,а помирає
+                                else if (asteroids[i].level === 3) {
+                                    score += 30
+                                }
+                                asteroids.splice(i, 1);
+                                bullets.splice(j, 1);
+                                break loop
+                            }
+                        }
+                    }
+            }
+            // Якщо гравець набрав більший score ,ніж highScore то
+            // highScore перезаписується
+            if (+highScore < +score) {
+                highScore = score
+                localStorage.setItem('highScore', score.toString())
+            }
+        },
+        clear() {
+            // очищення поля
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+        },
+        render({secondPart, fps}) {
+            // додаткова інформація виводиться на екран
+            ctx.fillStyle = 'white'
+            ctx.textAlign = 'left'
+            ctx.font = '20px Georgia'
+            ctx.fillText(`FPS: ${fps}`, canvas.width * 0.9, canvas.height * 0.1)
+            ctx.fillText(`High score: ${highScore}`, canvas.width * 0.1, canvas.height * 0.1 - 20)
+            ctx.fillText(`score: ${score}`, canvas.width * 0.1, canvas.height * 0.1)
+            ctx.fillText(`lives: ${lives}`, canvas.width * 0.1, canvas.height * 0.1 + 20)
+            if (lives <= 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                asteroids.length = 0
+                ctx.fillStyle = 'white'
+                ctx.textAlign = 'center'
+                ctx.font = '200px Georgia'
+                ctx.fillText(`Game over`, canvas.width / 2, canvas.height / 2)
+                ctx.font = '70px Georgia'
+                ctx.fillStyle = 'royalblue'
+                ctx.fillText(`press space to restart`, canvas.width / 2, canvas.height / 2 + 200)
+                ctx.font = '30px Georgia'
+                ctx.fillStyle = 'red'
+                ctx.fillText(`Your score ${score}`, canvas.width / 2, canvas.height / 2 + 270)
+                window.addEventListener('keyup', (e) => {
+                    if (e.code === 'Space') {
+                        score = 0
+                        lives = 5
+                    }
+                })
+            }
+            // якщо lives > 0  рендеряться астероїди пульки і все решта
+            else {
+                if (spaceship.visible) {
+                    spaceship.update(secondPart)
+                    spaceship.render()
+                }
+                if (bullets.length !== 0) {
+                    for (let i = 0; i < bullets.length; i++) {
+                        bullets[i].update(spaceship.angle)
+                        bullets[i].render()
+                    }
+                }
+                if (asteroids.length !== 0) {
+                    for (let j = 0; j < asteroids.length; j++) {
+                        asteroids[j].update();
+                        asteroids[j].render(j);
+                    }
+                }
+            }
+
         }
-
-        requestAnimationFrame(animation)
-
-// '#' + (Math.random().toString(16) + '000000').substring(2, 8).toUpperCase();
-    }
-
+    })
 }
