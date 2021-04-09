@@ -335,7 +335,6 @@ function TheGame() {
             if (lives <= 0) {
                 asteroids.length = 0
                 bullets.length = 0
-                spaceship.
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
                 ctx.fillStyle = 'white'
                 ctx.textAlign = 'center'
