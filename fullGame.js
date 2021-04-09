@@ -8,7 +8,7 @@ function TheGame() {
     let asteroids = [];
     let bullets = []
     let score = 0;
-    let lives = 5;
+    let lives = 1;
 
 
 // function collides(obj1, obj2) {
@@ -333,8 +333,10 @@ function TheGame() {
             ctx.fillText(`score: ${score}`, canvas.width * 0.1, canvas.height * 0.1)
             ctx.fillText(`lives: ${lives}`, canvas.width * 0.1, canvas.height * 0.1 + 20)
             if (lives <= 0) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height)
                 asteroids.length = 0
+                bullets.length = 0
+                spaceship.
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
                 ctx.fillStyle = 'white'
                 ctx.textAlign = 'center'
                 ctx.font = '200px Georgia'
@@ -348,7 +350,7 @@ function TheGame() {
                 window.addEventListener('keyup', (e) => {
                     if (e.code === 'Space') {
                         score = 0
-                        lives = 5
+                        lives = 1
                     }
                 })
             }
