@@ -274,7 +274,7 @@ function TheGame() {
         const diff = timestamp - pTime
         pTime = timestamp
         // fps кількість кадрів в секунду
-        const fps = Math.floor(1000 / diff) 
+        const fps = Math.round(1000 / diff) 
         // secondPart обернена величина до к-сті кадрів ,
         // потрібна для правильного оновлення
         const secondPart = diff / 1000
