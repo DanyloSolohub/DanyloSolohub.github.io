@@ -8,7 +8,7 @@ function TheGame() {
     let asteroids = [];
     let bullets = []
     let score = 0;
-    let lives = 1;
+    let lives = 5;
 
 
 // function collides(obj1, obj2) {
@@ -349,7 +349,7 @@ function TheGame() {
                 window.addEventListener('keyup', (e) => {
                     if (e.code === 'Space') {
                         score = 0
-                        lives = 1
+                        lives = 5
                     }
                 })
             }
