@@ -54,7 +54,6 @@ function TheGame() {
         }
     }
 
-
     class Ship extends GameObj {
         constructor() {
             super(canvas.width / 2, canvas.height / 2, 0.05, 14, Math.PI / 2)
@@ -76,32 +75,32 @@ function TheGame() {
             } else if (this.angle < 0) {
                 this.angle = 2 * Math.PI
             }
-            window.addEventListener('keydown', (e) => {
-                if (e.code === 'KeyW') {
-                    this.movingFront = true
-
-                }
-                if (e.code === 'KeyA') {
-                    this.movingLeft = true
-                    this.movingRight = false
-                }
-                if (e.code === 'KeyD') {
-                    this.movingLeft = false
-                    this.movingRight = true
-                }
-            })
-            window.addEventListener('keyup', (e) => {
-                if (e.code === 'KeyW') {
-                    this.movingFront = false
-
-                }
-                if (e.code === 'KeyA') {
-                    this.movingLeft = false
-                }
-                if (e.code === 'KeyD') {
-                    this.movingRight = false
-                }
-            })
+            // window.addEventListener('keydown', (e) => {
+            //     if (e.code === 'KeyW') {
+            //         this.movingFront = true
+            //
+            //     }
+            //     if (e.code === 'KeyA') {
+            //         this.movingLeft = true
+            //         this.movingRight = false
+            //     }
+            //     if (e.code === 'KeyD') {
+            //         this.movingLeft = false
+            //         this.movingRight = true
+            //     }
+            // })
+            // window.addEventListener('keyup', (e) => {
+            //     if (e.code === 'KeyW') {
+            //         this.movingFront = false
+            //
+            //     }
+            //     if (e.code === 'KeyA') {
+            //         this.movingLeft = false
+            //     }
+            //     if (e.code === 'KeyD') {
+            //         this.movingRight = false
+            //     }
+            // })
             if (this.movingLeft) {
                 this.angle += this.angleSpeed * secondPart
             }
@@ -243,6 +242,32 @@ function TheGame() {
     )
     highScore = localStorage.getItem('highScore') || 0
     let spaceship = new Ship()
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'KeyW') {
+            spaceship.movingFront = true
+
+        }
+        if (e.code === 'KeyA') {
+            spaceship.movingLeft = true
+            spaceship.movingRight = false
+        }
+        if (e.code === 'KeyD') {
+            spaceship.movingLeft = false
+            spaceship.movingRight = true
+        }
+    })
+    window.addEventListener('keyup', (e) => {
+        if (e.code === 'KeyW') {
+            spaceship.movingFront = false
+
+        }
+        if (e.code === 'KeyA') {
+            spaceship.movingLeft = false
+        }
+        if (e.code === 'KeyD') {
+            spaceship.movingRight = false
+        }
+    })
     animation({
         update() {
             // Якщо астероїдів немає на полі , то вони з'являються
