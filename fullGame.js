@@ -75,32 +75,7 @@ function TheGame() {
             } else if (this.angle < 0) {
                 this.angle = 2 * Math.PI
             }
-            // window.addEventListener('keydown', (e) => {
-            //     if (e.code === 'KeyW') {
-            //         this.movingFront = true
-            //
-            //     }
-            //     if (e.code === 'KeyA') {
-            //         this.movingLeft = true
-            //         this.movingRight = false
-            //     }
-            //     if (e.code === 'KeyD') {
-            //         this.movingLeft = false
-            //         this.movingRight = true
-            //     }
-            // })
-            // window.addEventListener('keyup', (e) => {
-            //     if (e.code === 'KeyW') {
-            //         this.movingFront = false
-            //
-            //     }
-            //     if (e.code === 'KeyA') {
-            //         this.movingLeft = false
-            //     }
-            //     if (e.code === 'KeyD') {
-            //         this.movingRight = false
-            //     }
-            // })
+            
             if (this.movingLeft) {
                 this.angle += this.angleSpeed * secondPart
             }
